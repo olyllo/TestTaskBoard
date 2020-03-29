@@ -22,21 +22,23 @@
 	<form method="post">
   <div class="container-fluid" style="background-color: #fcf8e3; margin: 20px; border-radius: 10px; max-width:1200px">
   <div class="form-group">
-  <label for="exampleInputEmail1">Email address</label>
-    <input type="email" name ="userLogin" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+  <label for="InputName">Name</label>
+    <input type="text" name ="userLogin" required class="form-control" id="InputName" aria-describedby="emailHelp" placeholder="Name">
+    <small id="logginName" class="form-text text-muted">We'll never share your email with anyone else.</small>
   </div>
   <div class="form-group">
-    <label for="exampleInputPassword1">Password</label>
-    <input type="password" name="userPswd" class="form-control" id="exampleInputPassword1" placeholder="Password">
+    <label for="InputPassword1">Password</label>
+    <input type="password" name="userPswd" required class="form-control" id="InputPassword1" placeholder="Password">
   </div>
   <? if ($this->model['LOGGINADMINERROR']!='')
   {
       echo '<p style="color:#F84E5C;font-size: 14px; font-weight: bold; padding: 0 10px;">'.$this->model['LOGGINADMINERROR'].'</p>';
   } ?>
   <button type="submit" name="doLogin" class="btn btn-primary">Loggin</button>
-  <button type="submit" name="goBack" class="btn btn-primary">Back</button>
-  
+</form>
+<form method="post">
+  <hr>
+  <button type="submit" name="goBack" class="btn btn-primary"> << Back</button>
 </form>
 </div>
     	

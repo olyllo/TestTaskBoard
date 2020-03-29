@@ -19,9 +19,9 @@ class Task_Model extends DB_Driver {
       parent::__construct ();
     }
 
-	function modelLoginUser ($Email, $Pass){
+	function modelLoginUser ($Name, $Pass){
       $userPswd=MD5($Pass);
-        $sql = "SELECT * FROM `user` WHERE `user_email` = '$Email' AND `user_pass`= '$userPswd' "; 
+        $sql = "SELECT * FROM `user` WHERE `user_name` = '$Name' AND `user_pass`= '$userPswd' "; 
         $this->sqlSendQuery($sql);
         $row = $this->sqlGetOneRow();
         if (isset($row['user_id'])){
@@ -39,6 +39,8 @@ class Task_Model extends DB_Driver {
     }
 
     function modelSaveChanges($id, $text='',$status=''){
+        echo $text;
+        echo $status;
         if($status!=''){
             if(($status!='')&&($text!=''))
             {
@@ -57,6 +59,7 @@ class Task_Model extends DB_Driver {
                 $sql="UPDATE `task` SET `task_text` = '$text' WHERE `task`.`task_id` = '$id'";
             }
         }
+        echo $sql;
         $rez=$this->sqlSendQuery($sql);
         if ($rez){
             return true;}
@@ -67,7 +70,10 @@ class Task_Model extends DB_Driver {
     function modelAddTask($text,$status,$user){
         $sql = "INSERT INTO `task` (`task_text`, `task_status`, `created`, `updated`,`user`)
              VALUES ('" .$text . "', '" . $status . "', NOW(),NOW(),'" .$user."')";
-        $this->sqlSendQuery($sql);
+        if($this->sqlSendQuery($sql))
+        {
+            return true;
+        }
     }
 
     function modelAddUser($name, $email){

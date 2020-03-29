@@ -13,7 +13,7 @@ class Task_Controller extends Task_View {
 		GLOBAL $_POST;
 		GLOBAL $_GET;
 		GLOBAL $GLOBALS;
-		$this->model = array('NAMEERROR'=>'','EMAILERROR'=>'','TEXTERROR'=>'','NAMEVALUE'=>'','EMAILVALUE'=>'', 'TEXTVALUE'=>'','LOGGINERROR'=>'','TEXTCGANGED'=>'','LOGGINADMINERROR'=>'');
+		$this->model = array('NAMEERROR'=>'','EMAILERROR'=>'','TEXTERROR'=>'','NAMEVALUE'=>'','EMAILVALUE'=>'', 'TEXTVALUE'=>'','LOGGINERROR'=>'','TEXTCGANGED'=>'','LOGGINADMINERROR'=>'', 'ADDSUCSESS'=>'');
 				
 		if (isset ($_POST['doLogin']) ){
 			$this->doLogin ($_POST['userLogin'], $_POST['userPswd']);
@@ -52,31 +52,36 @@ class Task_Controller extends Task_View {
 				$_SESSION['order_sort']='DESC';
 			}
 			elseif($_POST['sortTask']=='By status ascending'){
-				$_SESSION['fild_sort']='status';
+				$_SESSION['fild_sort']='task_status';
 				$_SESSION['order_sort']='ASC';
 			}
 			elseif($_POST['sortTask']=='By status descending'){
-				$_SESSION['fild_sort']='status';
+				$_SESSION['fild_sort']='task_status';
 				$_SESSION['order_sort']='DESC';
 			}
 		}
-		/*elseif(!isset($_POST['doSort'])){
+		elseif(!isset($_POST['doSort'])){
 				$_SESSION['fild_sort']='created';
-				$_SESSION['order_sort']='ASC';
+				$_SESSION['order_sort']='DESC';
 
-		}*/
+		}
 	}
 			
 	
 	//Make authorization
 	function doLogin ($login, $pswd){
-		if (!$this->modelLoginUser ($login, $pswd))
-      	{	
-			$this->setRegularERRORorVALUE('LOGGINADMINERROR', 'No such admin, please check your login or password and try again');
-						
-		}elseif($this->modelLoginUser ($login, $pswd))
-		{
-			$this->Logining(0);
+		if(($login=='')||($pswd=='')){
+			$this->setRegularERRORorVALUE('LOGGINADMINERROR', 'Plesse fill the fild(s)');
+		}
+		else{
+			if (!$this->modelLoginUser ($login, $pswd))
+			{	
+				$this->setRegularERRORorVALUE('LOGGINADMINERROR', 'No such admin, please check your login or password and try again');
+							
+			}elseif($this->modelLoginUser ($login, $pswd))
+			{
+				$this->Logining(0);
+			}
 		}
     
 	}
@@ -109,16 +114,22 @@ class Task_Controller extends Task_View {
 			$name=$data['userofferName'];
 			$status = NEW_TASK;
 			if (isset($user_id)){
-				$this->modelAddTask($text, $status, $user_id);
+				if($this->modelAddTask($text, $status, $user_id)){
+					$this->setRegularERRORorVALUE('ADDSUCSESS','Task Add successfully!');
+				}
 			}
 			else{
 				$this->modelAdduser($name,$email);
 				$user_id=$this->modelFindUser($email);
-				$this->modelAddTask($text, $status, $user_id);
+				if($this->modelAddTask($text, $status, $user_id)){
+					$this->setRegularERRORorVALUE('ADDSUCSESS','Task Add successfully!');
+				}
 			}
 		}
 
 	}
+
+	
 
 	public function ChekEmail($email)
 	{
@@ -154,15 +165,16 @@ class Task_Controller extends Task_View {
 
 	public function CheckText($text)
 	{
+		$text=htmlspecialchars($text);
 		if(iconv_strlen($text)==0)
 		{
 			$this->setRegularERRORorVALUE('TESTVALUE', $text);
 			$this->setRegularERRORorVALUE('TEXTERROR', 'Empty fild plese write some task');
 			return false;
 		}
-		elseif(iconv_strlen($text)<24){
+		elseif(iconv_strlen($text)<5){
 			$this->setRegularERRORorVALUE('TESTVALUE', $text);
-			$this->setRegularERRORorVALUE('TEXTERROR', 'Task should be more 24 symbols');
+			$this->setRegularERRORorVALUE('TEXTERROR', 'Task should be more 5 symbols');
 			return false;
 		}
 		else
@@ -179,8 +191,8 @@ class Task_Controller extends Task_View {
 			$this->setRegularERRORorVALUE('TEXTCGANGED', 'Empty fild plese write some task');
 			return false;
 		}
-		elseif(iconv_strlen($text)<24){
-			$this->setRegularERRORorVALUE('TEXTCGANGED', 'Task should be more 24 symbols');
+		elseif(iconv_strlen($text)<5){
+			$this->setRegularERRORorVALUE('TEXTCGANGED', 'Task should be more 5 symbols');
 			return false;
 		}
 		else
@@ -214,17 +226,15 @@ class Task_Controller extends Task_View {
 						if($status=='on'){
 							$status=TASK_DONE;
 						}
-						else{
-							$status=TASK_UPDATED;
-						}
 						if($this->modelSaveChanges($id, $text,$status)){
-							$this->setRegularERRORorVALUE('TEXTCGANGED', 'Pleas loggin as admin to change task');
+							$this->setRegularERRORorVALUE('TEXTCGANGED', 'Task updated!');
 						}
 					}
 					else
 					{
-						if($this->modelSaveChanges($id, $text)){
-							$this->setRegularERRORorVALUE('TEXTCGANGED', 'Pleas loggin as admin to change task');
+						$status=TASK_UPDATED;
+						if($this->modelSaveChanges($id, $text,$status)){
+							$this->setRegularERRORorVALUE('TEXTCGANGED', 'Task updated!');
 						}
 					}
 				}
@@ -238,14 +248,14 @@ class Task_Controller extends Task_View {
 		}
 	}
 
-	function makePaginator($pageNumber=1,$orderBy='task_id',$direction='DESC'){		
+	function makePaginator($pageNumber=1,$orderBy,$direction){		
 		$pages=$this->getPageNum($pageNumber);
 		$pages++;
 		$this->setCurPage($pageNumber);
 		if (!isset($list)) $list=0;
 		$list=--$pageNumber*QUANTITY;
-		$news_block = $this->modelGetTasksForCurentPage($list,$orderBy,$direction);
-		return $news_block;
+		$task_block = $this->modelGetTasksForCurentPage($list,$orderBy,$direction);
+		return $task_block;
 
 
 	}
@@ -275,14 +285,9 @@ class Task_Controller extends Task_View {
 		}
 		return $arr;
 	}
+
 	function getSortData($n=1){
-		if(isset($_SESSION['Set_sort']))
-		{
-			$arr = $this->makePaginator($n,$_SESSION['fild_sort'],$_SESSION['order_sort']);
-		}
-		else{
-			$arr = $this->makePaginator($n,'created','ASC');
-		}
+		$arr = $this->makePaginator($n,$_SESSION['fild_sort'],$_SESSION['order_sort']);
 		return $arr;
 	}
 

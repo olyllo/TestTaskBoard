@@ -60,8 +60,11 @@ if ($this->model['LOGGINERROR']!='')
 } 
   if ($this->model['TEXTCGANGED']!='')
 {
-    echo '<p style="color:#F84E5C;font-size: 14px; font-weight: bold; padding: 0 10px;">'.$this->model['TEXTCGANGED'].'</p>';
+    echo '<p style="color:green;font-size: 14px; font-weight: bold; padding: 0 10px;">'.$this->model['TEXTCGANGED'].'</p>';
 } 
+
+
+
 echo '<form action="" method="post" >
 <div class="form-row">
 <div class="form-group col-md-1">
@@ -79,7 +82,7 @@ echo '<form action="" method="post" >
      </select>
   </div>
   <div class="form-group col-md-4">
-    <input type="submit" name="doSort" class="btn btn-primary"'.$abble.' value="Sort">
+    <input type="submit" name="doSort" class="btn btn-primary" value="Sort">
   </div>
   
   </div>
@@ -88,8 +91,8 @@ echo '<div class="row">
         <div class="col-sm-8">
           <div class="container-fluid" style="">
             ';
-foreach($arr as $news){
-  if ($news['task_status']==1){
+foreach($arr as $tasks){
+  if ($tasks['task_status']==1){
     $check='checked';
   }
   else {
@@ -100,41 +103,48 @@ echo '<div style="background-color: #fcf8e3; padding: 20px; margin-bottom: 20px;
           <div class="form-group" hidden>
             <label class="col-sm-2 col-form-label">Name</label>
             <div class="col-sm-10">
-              <input type="text" class="form-control" name="userId" value='.$news['task_id'].'>
+              <input type="text" class="form-control" name="userId" value='.$tasks['task_id'].'>
             </div>
           </div>
 
           <div class="form-group">
             <label for = "userName">Name</label>
-            <input type="text" class="form-control" name="userName" id="userName'.$news['user_name'].'" value="'.$news['user_name'].'" disabled>
+            <input type="text" class="form-control" name="userName" id="userName'.$tasks['user_name'].'" value="'.$tasks['user_name'].'" disabled>
           </div>
     
           <div class="form-group">
             <label for="userEmail">Email</label>
-            <input type="text" class="form-control" name="userEmail" id="userEmail'.$news['user_id'].'" value="'.$news['user_email'].'" disabled>
+            <input type="text" class="form-control" name="userEmail" id="userEmail'.$tasks['user_id'].'" value="'.$tasks['user_email'].'" disabled>
           </div>
 
           <div class="form-group">
               <label for="Textarea">Task</label>
-              <input type="text" class="form-control" name="userText" id="Textarea" rows="3" value="'.$news['task_text'].'"'.$abble.'>
+              <input type="text" class="form-control" name="userText" id="Textarea" rows="3" value="'.$tasks['task_text'].'"'.$abble.'>
           </div>
 
           <div class="form-check">
             <label class="form-check-label">сделлано</label>
             <input type="checkbox"'.$check.' name="userDone" class="form-check-input"'.$abble.'>
-          </div>
+          </div>';
+          if ($tasks['task_status']==2)
+          {
+              echo '<p style="color:green;font-size: 14px; font-weight: bold;">Task updated by admin</p>';
+          }
 
-          <input type="submit" name="doSaveChanges" class="btn btn-primary"'.$abble.'>
+        echo'<input type="submit" name="doSaveChanges" class="btn btn-primary"'.$abble.'>
         </form>
       </div>';
 }
 echo '</div>
   </div>
     <div class="col-sm-4">
-      <div style="background-color: #fcf8e3; padding: 20px; margin: 20px; border-radius: 10px;">
-        <form action="" method="post" >
-        <h2>Offer News</h2>
-        <div class="form-group">
+      <div style="background-color: #fcf8e3; padding: 20px; margin: 20px; border-radius: 10px;"> <form action="" method="post" >
+        <h2>Add Task</h2>';
+        if ($this->model['ADDSUCSESS']!='')
+        {
+            echo '<p style="color:green;font-size: 14px; font-weight: bold; padding: 0 10px;">'.$this->model['ADDSUCSESS'].'</p>';
+        } 
+      echo'<div class="form-group">
         <label for = "userName">Name</label>
         <input type="text" class="form-control" name="userofferName" id="userofferName" required value="'.$this->model['NAMEVALUE'].'"';
 if ($this->model['NAMEERROR']!='')
