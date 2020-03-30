@@ -13,6 +13,9 @@ class Task_Model extends DB_Driver {
 	public $userData;
     public $userAdmin;
     public $fileLink;
+    public $Set_sort;
+    public $fild_sort;
+    public $order_sort;
 
     function __construct (){
         $this->sessionLoadUser();
@@ -121,9 +124,21 @@ class Task_Model extends DB_Driver {
     }
 
     function modelLogoutUser (){
+        if (isset($_SESSION['Set_sort'])){
+            $this->Set_sort=$_SESSION['Set_sort'];
+            $this->fild_sort=$_SESSION['fild_sort'];
+            $this->order_sort=$_SESSION['order_sort'];
+        }
 	    session_destroy();
-	    session_start();
+        session_start();
+        $this->sessionSaveSorting();
         $this->sessionLoadUser();
+    }
+
+    function sessionSaveSorting (){
+        $_SESSION['Set_sort'] =  $this->Set_sort;
+        $_SESSION['fild_sort'] = $this->fild_sort;
+        $_SESSION['order_sort'] = $this->order_sort;
     }
 
     function sessionSaveUser (){
